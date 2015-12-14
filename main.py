@@ -82,8 +82,11 @@ class Guestbook(safeserver.RequestHandler):
 
         cursor = db.cursor()
         # Note that the only format string supported is %s
-        command = 'INSERT INTO entries (guestName, content) VALUES ("' + fname + '", "' + content + '")'
-        cursor.execute(command)
+        try:
+            command = 'INSERT INTO entries (guestName, content) VALUES ("' + fname + '", "' + content + '")'
+            cursor.execute(command)
+        except:
+            pass
         db.commit()
         db.close()
 

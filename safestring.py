@@ -12,8 +12,18 @@ class SafeString:
             self._next = SafeString(self._next)
         self._safe = kwargs["safe"] if "safe" in kwargs else True
 
+    def unsafe_substrings(self):
+        lst = []
+        if self._prev is not None:
+            lst.extend(self._prev.unsafe_substrings())
+        if not self._safe:
+            lst.append(self._val)
+        if self._next is not None:
+            lst.extend(self._next.unsafe_substrings())
+        return lst
+
     def __str__(self):
-        return self.__repr__()
+        #return self.__repr__()
         representation = ""
         if self._prev is not None:
             representation += self._prev.__str__()
