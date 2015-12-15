@@ -4,10 +4,12 @@ class SafeString:
         operations as normal strings, with one crucial difference:
         it keeps track of the unsafe pieces that were used to create it.
 
+        As with built-in strings, SafeStrings are immutable.
+
         Internally, it is maintained as a binary tree of strings, where the
         represented string is built by an in-order traversal of the tree.
-
-        As with built-in strings, SafeStrings are immutable.
+        A performance improvement could be had if the tree were to rebalance
+        itself, and perhaps keep track of data like its length.
     """
     def __init__(self, *args, **kwargs):
         """ Creates a SafeString.  The first argument, which is optional, is
@@ -157,6 +159,57 @@ class SafeString:
         if isinstance(other, SafeString):  # Special case to match str behavior
             other = str(other)
         return str(self) != other
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            key = slice(key, key + 1)
+        l = len(self._val)
+        p = len(self._prev) if self._prev is not None else 0
+        n = len(self._next) if self._next is not None else 0
+        total_len = p + l + n
+        rval = SafeString("")
+
+        if key.step is None:
+            key = slice(key.start, key.stop, 1)
+        if key.start is not None and key.start < 0:
+            key = slice(total_len + key.start, key.stop, key.step)
+        if key.stop is not None and key.stop < 0:
+            key = slice(key.start, total_len + key.stop, key.step)
+        if key.step > 0:
+            if key.stop is None:
+                key = slice(key.start, total_len, key.step)
+            if not 0 <= key.start < key.stop <= total_len:
+                return rval
+            if key.stop <= p:
+                return self._prev[key]
+            if key.start >= p + l:
+                return self._next[key]
+            if key.start is None or key.start < p:
+                rval += self._prev[key.start : : key.step]
+                key = slice(0, key.stop - p, key.step)
+            rval += self._val[key]
+            key = slice(0, key.stop - l, key.step)
+            if key.stop > 0 and self._next is not None:
+                rval += self._next[key]
+        else:
+            if key.start is None:
+                key = slice(total_len - 1, key.stop, key.step)
+            if not 0 < key.start < total_len and (key.stop is not None
+                                                and key.stop < key.start):
+                return rval
+            if key.start <= p:
+                return self._prev[key]
+            if key.stop is not None and key.stop >= p + l:
+                return self._next[key]
+            if key.start >= p + l and self._next is not None:
+                rval += self._next[key.start : : key.step]
+                key = slice(l - 1, key.stop, key.step)
+            rval += self._val[key]
+            key = slice(key.start - l, key.stop, key.step)
+            if (key.stop is None or key.stop < p - 1) and self._prev is not None:
+                rval += self._prev[key]
+        return rval
+
 
     def capitalize(self):
         if self._prev is not None:
