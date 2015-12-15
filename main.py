@@ -33,13 +33,8 @@ class Test(safeserver.RequestHandler):
         response = urllib2.urlopen(req)
         content = response.read()
         self.response.out.write(content)
-# ;0+gT&OqT:Ja
-# root, toor
-# colin, passwd
+
 class MainHandler(safeserver.RequestHandler):
-    # def get(self):
-    #     param = self.request.get('param', 'None')
-    #     self.response.write("Hello world... " + param)
     def get(self):
         # Display existing guestbook entries and a form to add new entries.
         env = os.getenv('SERVER_SOFTWARE')
@@ -92,18 +87,7 @@ class Guestbook(safeserver.RequestHandler):
 
         self.redirect("/")
 
-# if (env and env.startswith('Google App Engine/')):
-#   # Connecting from App Engine
-#   db = safesql.connect(
-#     unix_socket='/cloudsql/injection-free-server',
-#     user='root')
-# else:
-#   # Connecting from an external network.
-#   # Make sure your network is whitelisted
-#   db = safesql.connect(
-#     host='173.194.253.12',
-#     port=3306,
-#     user='root')
+
 
 app = safeserver.WSGIApplication([
     ('/sign', Guestbook),
