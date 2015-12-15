@@ -46,7 +46,7 @@ def remove_safe_strings(inputs, tokens):
 
 def queries_are_safe(query):
     """ Given a query, determines if it is safe.
-        We assume raw strings are safe (ie. they came from the programmer.
+        We assume raw strings are safe (ie. they came from the programmer).
         If input is a SafeString, we compare the unsafe substrings with the
         tokens generated from parsing the query.
     """

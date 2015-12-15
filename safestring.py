@@ -20,7 +20,6 @@ class SafeString:
                 Defaults to True.
         """
         self._val = str(*args)
-        # set obj next and prev, or array or something
         self._prev = kwargs["prev"] if "prev" in kwargs else None
         self._next = kwargs["next"] if "next" in kwargs else None
         if self._prev is not None and not isinstance(self._prev, SafeString):
@@ -29,10 +28,6 @@ class SafeString:
             self._next = SafeString(self._next)
         self._safe = kwargs["safe"] if "safe" in kwargs else True
 
-
-    def __instancecheck__(self, instance):
-        print "here1"
-        return isinstance(self, str) or isinstance(self, SafeString)
 
     def unsafe_substrings(self):
         """ Returns a list of all of the unsafe portions of this string,
