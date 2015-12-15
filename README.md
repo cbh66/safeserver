@@ -10,6 +10,7 @@ This module provides the API for constructing the server.  The API is exactly th
 This module provides the API for making SQL queries, which is the same as (and uses) the MySQLdb module.  The addition is that, if it detects injection, it throws an InjectionError exception.
 
 Injection is detected with the following steps:
+
 1. Parse the attempted query into tokens
 2. Extract the dangerous parts (those that came from the user)
 3. For each, find the token that corresponds to this part.
@@ -26,7 +27,9 @@ SafeString objects, like strings, are immutable.  Each is represented as a tree 
 ## main.py ##
 This is the implementation of the web server using this framework.  It was built using Google's own tutorial, but replacing their import statements with imports for this module.
 
-There is an injection vulnerability at line 81, when the guestbook is signed, and the SQL query to insert it is built with string concatenation.  With the use of safeserver and safesql, however, attacks will not be executed.
+### Vulnerabilities ###
+
+This server has two injection vulnerabilities.  The first is on line 58, where the database is searched, and the second on line 91, where data is inserted.  Both are the result of string concatenation, and both will be caught and rejected.
 
 # Improvements #
 This implementation of SafeStrings is not optimized.  The best optimization would be to properly balance the trees, however some operations could also be sped up (they were written for clarity and functionality).  It is assumed that most strings are not made of too many concatenated substrings, so these operations should still be fine for most purposes.

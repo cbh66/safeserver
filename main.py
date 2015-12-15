@@ -1,3 +1,9 @@
+""" Implementation of a simple guestbook server.
+    Replacing "safeserver" with "webapp2" would introduce an injection
+    vulnerability.  However, safeserver is able to properly mark input as
+    dangerous, so queries through safesql reject injection attacks.
+"""
+
 import os
 import sys
 
@@ -45,16 +51,23 @@ class MainHandler(safeserver.RequestHandler):
             # Alternatively, connect to a Google Cloud SQL instance using:
             # db = safesql.connect(host='ip-address-of-google-cloud-sql-instance', port=3306, user='root', charset='utf8')
 
+        guestlist = [];
         cursor = db.cursor()
-        cursor.execute('SELECT guestName, content, entryID FROM entries')
+        try:
+            query = 'SELECT guestName, content, entryID FROM entries'
+            user = self.request.get('user')
+            if user:
+                query += " WHERE guestName = '" + user + "'"
+            cursor.execute(query)
+            for row in cursor.fetchall():
+                guestlist.append(dict([('name',cgi.escape(row[0])),
+                                     ('message',cgi.escape(row[1])),
+                                     ('ID',row[2])
+                                     ]))
+        except:
+            pass
 
         # Create a list of guestbook entries to render with the HTML.
-        guestlist = [];
-        for row in cursor.fetchall():
-          guestlist.append(dict([('name',cgi.escape(row[0])),
-                                 ('message',cgi.escape(row[1])),
-                                 ('ID',row[2])
-                                 ]))
 
         variables = {'guestlist': guestlist}
         template = JINJA_ENVIRONMENT.get_template('main.html')
