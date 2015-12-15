@@ -29,7 +29,7 @@ This is the implementation of the web server using this framework.  It was built
 
 ### Vulnerabilities ###
 
-This server has two injection vulnerabilities.  The first is on line 58, where the database is searched, and the second on line 91, where data is inserted.  Both are the result of string concatenation, and both will be caught and rejected.
+This server has two injection vulnerabilities.  The first is on line 60, where the database is searched, and the second on line 94, where data is inserted.  Both are the result of string concatenation, and both will be caught and rejected.
 
 # Improvements #
 This implementation of SafeStrings is not optimized.  The best optimization would be to properly balance the trees, however some operations could also be sped up (they were written for clarity and functionality).  It is assumed that most strings are not made of too many concatenated substrings, so these operations should still be fine for most purposes.
